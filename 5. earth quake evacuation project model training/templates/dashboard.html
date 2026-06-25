@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Earthquake System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/dashboard" class="active">Dashboard</a>
+            </nav>
+        </header>
+
+        <main class="dashboard-grid">
+            <div class="card">
+                <h3>Model Accuracy</h3>
+                <canvas id="accuracyChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Dataset Details</h3>
+                <div class="dataset-stats">
+                    <div class="stat-item">
+                        <span>Total Samples</span>
+                        <strong>{{ metrics.total_samples }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Training Records</span>
+                        <strong>{{ metrics.train_samples }}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Testing Records</span>
+                        <strong>{{ metrics.test_samples }}</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Model F1 Scores</h3>
+                <canvas id="f1Chart"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ctxAcc = document.getElementById('accuracyChart').getContext('2d');
+        new Chart(ctxAcc, {
+            type: 'bar',
+            data: {
+                labels: ['Random Forest', 'Linear Model'],
+                datasets: [{
+                    label: 'Accuracy (%)',
+                    data: [{{ metrics.rf_accuracy }}, {{ metrics.lr_accuracy }}],
+                    backgroundColor: ['#4f46e5', '#10b981']
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+
+        const ctxF1 = document.getElementById('f1Chart').getContext('2d');
+        new Chart(ctxF1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Random Forest F1', 'Linear Model F1'],
+                datasets: [{
+                    data: [{{ metrics.rf_f1 }}, {{ metrics.lr_f1 }}],
+                    backgroundColor: ['#6366f1', '#34d399']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
